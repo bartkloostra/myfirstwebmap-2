@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <title> My title </title>
+    
+      <link rel="stylesheet" href="main.css"/>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+  
+    integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+  crossorigin=""/>
+      
+      <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+  </head>
+  <body>
+      <H1>Kaart van Estuarium van Taag en Lagune van Venetie</H1>
+      <div id="map"></div>
+          
+
+   <script>
+  //initialize the map         
+ var map = L.map('map').setView([42.3600825, -71.0588801], 12);
+  
+  //Create baselayer - tiles         
+ var backgroundMap = L.tileLayer('http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg',{
+    attribution: '<a href="http://openstreetmap.org">OpenStreetMap</a>contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+    maxZoom: 19
+    }
+                              
+  );
+     backgroundMap.addTo(map);
+     
+  //Add markers
+  var estuarium = L.marker([38.78941578, -9.01771545]).addTo(map);
+       
+  var lagune = L.marker([45.38591286, 12.28340149]).addTo(map);
+          
+  var thuis = L.marker([52.18655622, 5.38577646]).addTo(map);
+      
+  //Add popups
+var popup = "Estuarium van Taag";
+estuarium.bindPopup(popup);
+     
+var popup = "Lagune van Venetie";
+lagune.bindPopup(popup);
+     
+var popup = "Thuis";
+thuis.bindPopup(popup);
+          
+  //Add circle
+  var circle = L.circle([52.18655622, 5.38577646], 500, {
+  color: 'red',
+  fillColor: '#f03',
+  fillOpacity: 0.5
+}).addTo(map);
+     
+ //Add polygon
+     var polygon = L.polygon([
+  [38.78941578, -9.01771545],
+  [45.38591286, 12.28340149],
+  [52.18655622, 5.38577646]
+]).addTo(map);
+     
+  // Create a marker first
+var geojsonMarkerOptions = {
+  radius: 8,
+  fillColor: "#ff7800",
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+};
+
+//create a empty geojson layer
+var geojson = L.geoJson(null,{
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  }
+}).addTo(map);
+
+var geojsonMarkerOptions = {
+  radius: 8,
+  fillColor: "#ff7800",
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+};
+     
+  //create a empty geojson layer
+var geojson = L.geoJson(null,{
+  pointToLayer: function (geoJsonPoint, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  }
+}).addTo(map);
+     
+  // new Http Request
+var xhttp = new XMLHttpRequest();
+
+// set the request method and data file
+xhttp.open('GET', encodeURI("All_BFRO_Reports_points.js"));
+
+//specify what must be done with the geojson data to the layer when request is succesfull
+xhttp.onload = function() {
+  if (xhttp.readyState === 4) {
+      // add the json data to the geojson layer we created before!
+      geojson.addData(JSON.parse(xhttp.responseText));
+    } else {
+      alert('Request failed.  Returned status of ' + xhttp.status);
+    }
+};
+
+// send the request
+xhttp.send();
+     
+</script>
+      
+  </body>
+</html>
